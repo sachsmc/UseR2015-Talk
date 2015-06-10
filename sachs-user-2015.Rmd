@@ -10,6 +10,12 @@ output:
 ---
 
 
+```{r init, include = FALSE}
+library(ggplot2)
+library(gridSVG)
+library(grid)
+```
+
 <script src="d3.v3.min.js"></script>
 
 ## Approaches to Interactive Graphs
@@ -32,8 +38,198 @@ shiny
 
 
 
-## Code
+## Proof of concept
 
-```{r}
-rnorm(1)
+```{r test-a, echo = FALSE, fig.keep='none', results = 'asis', fig.width=8, fig.height=6}
+p <- ggplot(mtcars, aes(x = mpg, y = hp)) + geom_point(size = 5) + 
+  scale_y_continuous(limits = c(-50, 500)) + scale_x_continuous(limits = c(0, 50))
+p
+
+grid.force()
+## grid.ls()  find the name of the points grob
+grid.export(NULL, prefix = "cars")$svg
 ```
+
+<button id="moveme">Move the points!</button>
+
+<script>
+
+function randCol() {
+
+    return "rgb(" + Math.round(Math.random()*255) + ", " + Math.round(Math.random()*255) + ", " + Math.round(Math.random()*255) + ")";
+
+} 
+
+d3.select("#moveme").on("click", function(){
+
+  d3.selectAll("[id^='carsgeom_point.points.2.1.']")
+    .transition().duration(500)
+    .attr("fill", randCol())
+    .attr("y", function(d){ return Number(d3.select(this).attr("y")) + 50 * (Math.random() - .5); })
+    .attr("x", function(d){ return Number(d3.select(this).attr("x")) + 25 * (Math.random() - .5); });
+  
+});
+</script>
+
+
+## ROC Curves
+
+```{r rocex, eval = FALSE}
+library(plotROC)
+D.ex <- rbinom(100, 1, .5)
+
+paired.data <- data.frame(M1 = rnorm(100, mean = D.ex), 
+                       M2 = rnorm(100, mean = D.ex, sd = .4), 
+                       M3 = runif(100), D = D.ex)
+
+roc.ci <- calculate_roc(paired.data$M1, paired.data$D, ci = TRUE, alpha = 0.05)
+ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
+
+cat(
+  export_interactive_roc(ci.rocplot, 
+                         prefix = "aci")
+  )
+```
+
+## Result
+
+```{r int-nob, fig.keep='none', results = 'asis', warning = FALSE, message = FALSE, echo = FALSE, fig.width=8, fig.height=6}
+library(plotROC)
+D.ex <- rbinom(100, 1, .5)
+
+paired.data <- data.frame(M1 = rnorm(100, mean = D.ex), 
+                       M2 = rnorm(100, mean = D.ex, sd = .4), 
+                       M3 = runif(100), D = D.ex)
+
+roc.ci <- calculate_roc(paired.data$M1, paired.data$D, ci = TRUE, alpha = 0.05)
+ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
+
+cat(
+  export_interactive_roc(ci.rocplot, 
+                         prefix = "aci")
+  )
+```
+
+
+## Kaplan-Meier Curves
+
+```{r test-km, fig.keep='none', results = 'asis', warning = FALSE, message = FALSE, echo = FALSE, fig.width=8, fig.height=6}
+library(survival)
+library(dplyr)
+
+gdat <- survival::lung
+fit <- survfit(Surv(time, status) ~ factor(sex), data = gdat)
+tdat <- with(fit, data.frame(n.risk, time, surv, strata = rep(1:2, strata)))
+targ.times <- seq(min(tdat$time), max(tdat$time), by = 15)[-c(1, 68)]
+
+interp <- function(dat, t){
+  
+  if(t %in% dat$time){
+    
+    return(dat[dat$time == t, ])
+    
+  } else {
+    
+    t2 <- max(dat$time[dat$time < t])
+    
+    d2 <- dat[dat$time == t2, ]
+    d2$time <- t
+    return(d2)
+    
+  }
+  
+}
+
+tdat2 <- NULL
+for(ttt in targ.times){
+  
+  tdat2 <- rbind(tdat2, tdat %>% group_by(strata) %>% do({
+  
+    interp(., ttt)
+  
+  }))
+}
+tdat <- tdat2[order(tdat2$strata, tdat2$time),]
+
+p1 <- ggplot(gdat, aes(x = time, status = status, color = factor(sex))) + geom_km()
+
+p1 + geom_text(data = tdat, aes(x = time, y = surv, label = n.risk, hjust = .5, vjust = -1,
+                                status = NULL, color = NULL), alpha = 0) + 
+  geom_point(data = tdat, aes(x = time, y = surv,
+                                status = NULL, color = NULL), alpha = 0)
+
+grid.force()
+lsg <- grep("geom_point.points.", grid.ls(print = FALSE)$name, value = TRUE)
+
+grid.garnish(lsg, tip = paste(tdat$n.risk), group = FALSE, global = TRUE, grep = TRUE)
+grid.export(NULL, prefix = "km")$svg
+```
+
+<script src="kmhover.js"></script>
+
+## Transitioning a line
+
+```{r trans, fig.keep='none', results = 'asis', echo = FALSE, fig.width=8, fig.height=6}
+sdat1 <- survfit(Surv(time, status) ~ 1, data = subset(lung, sex == 1))
+sdat2 <- survfit(Surv(time, status) ~ 1, data = subset(lung, sex == 2))
+## create stepfunction
+dostep <- function(x,y) {
+        keep <- is.finite(x) & is.finite(y) 
+        if (!any(keep)) return()  #all points were infinite or NA
+        if (!all(keep)) {
+            # these won't plot anyway, so simplify (CI values are often NA)
+            x <- x[keep]
+            y <- y[keep]
+        }
+        n <- length(x)
+        if (n==1)       list(x=x, y=y)
+        else if (n==2)  list(x=x[c(1,2,2)], y=y[c(1,1,2)])
+        else {
+            # replace verbose horizonal sequences like
+            # (1, .2), (1.4, .2), (1.8, .2), (2.3, .2), (2.9, .2), (3, .1)
+            # with (1, .2), (.3, .2),(3, .1).  
+            #  They are slow, and can smear the looks of the line type.
+            temp <- rle(y)$lengths
+            drops <- 1 + cumsum(temp[-length(temp)])  # points where the curve drops
+
+            #create a step function
+            if (n %in% drops) {  #the last point is a drop
+                xrep <- c(x[1], rep(x[drops], each=2))
+                yrep <- rep(y[c(1,drops)], c(rep(2, length(drops)), 1))
+            }
+            else {
+                xrep <- c(x[1], rep(x[drops], each=2), x[n])
+                yrep <- c(rep(y[c(1,drops)], each=2))
+            }
+            list(x=xrep, y=yrep)
+        }
+}
+
+step1 <- dostep(sdat1$time, sdat1$surv)
+step2 <- dostep(sdat2$time, sdat2$surv)
+
+p1 <- ggplot(lung, aes(x = time, status = status)) + geom_km(se = FALSE) + 
+  scale_x_continuous(limits = c(0, 1022)) + 
+  scale_y_continuous(limits = c(0, 1))
+p1 
+grid.force()
+#grid.ls()
+
+grid.garnish("GRID.polyline.381", 
+             tipy1 = paste(round(step1$y, 3), collapse = ","), 
+             tipx1 = paste(step1$x, collapse = ","),
+             tipy2 = paste(round(step2$y, 3), collapse = ","), 
+             tipx2 = paste(step2$x, collapse = ","),
+             group = TRUE, global = TRUE, grep = TRUE)
+grid.export(NULL, prefix = "km2")$svg
+```
+
+<form action="">
+<input type="radio" name="sex" value="overall" checked>Overall<br/>
+<input type="radio" name="sex" value="male">Male<br/>
+<input type="radio" name="sex" value="female">Female<br/>
+</form>
+
+
+<script src="kmtransition.js"></script>
+

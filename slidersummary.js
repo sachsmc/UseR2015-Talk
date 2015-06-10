@@ -29,7 +29,7 @@ var svg = d3.select("#approaches-to-interactive-graphs").append("svg")
 		} else {
 			return "interactivity";
 		}
-		
+
 	}
 
 svg.append("g")
@@ -74,14 +74,14 @@ var handle = slider.append("circle")
 slider
     .call(brush.event).transition() // gratuitous intro!
     .duration(750)
-    .call(brush.extent([70, 70]))
+    .call(brush.extent([100, 100]))
     .call(brush.event);
 
 
 var Rrect = svg.append("rect").attr("class", "rrect")
 	.attr("width", width/2)
 		.attr("height", height).attr("fill", "#2A6AB1");
-	
+
 var Jsrect = svg.append("rect").attr("class", "jsrect").attr("width", width/2)
 	.attr("transform", "translate(" + width/2 + ", 0)")
 		.attr("height", height).attr("fill", "#F0DB4F");
@@ -91,10 +91,10 @@ svg.append("")
 function brushed() {
   var value = brush.extent()[0];
 
-  if (d3.event.sourceEvent) { // not a programmatic event
-    value = x.invert(d3.mouse(this)[0]);
-    brush.extent([value, value]);
-  }
+  //if (d3.event.sourceEvent) { // not a programmatic event
+  //  value = x.invert(d3.mouse(this)[0]);
+  //  brush.extent([value, value]);
+  //}
 
   d3.select(".rrect").attr("width", x(value));
   d3.select(".jsrect").attr("width", width - x(value))
@@ -114,5 +114,5 @@ function brushed() {
 	  d3.select("#third").transition(150).attr("opacity", 1);
 	  d3.select("#first").transition(50).attr("opacity", 0);
   }
-  
+
 }
