@@ -1,0 +1,39 @@
+---
+title: "Interactive Graphics with ggplot2+gridSVG"
+author: "Michael Sachs"
+date: "June 8, 2015"
+output: 
+    ioslides_presentation:
+        widescreen: true
+        logo: US-NIH-NCI-Logo.svg
+        css: styles.css
+---
+
+
+<script src="d3.v3.min.js"></script>
+
+## Approaches to Interactive Graphs
+
+<div>
+<svg height = "50" width = "960">
+<text x=170 y=40 class="text1" id="first"> 
+htmlwidgets, ggvis, qtlcharts, animint, rCharts
+</text>
+<text x=350 y=40 class = "text1" id="second">
+ggplot2+gridSVG
+</text>
+<text x=375 y=40 class = "text1" id="third">
+shiny
+</text>
+</svg>
+</div>
+
+<script src="slidersummary.js"></script>
+
+
+
+## Code
+
+```{r}
+rnorm(1)
+```
