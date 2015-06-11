@@ -4,9 +4,10 @@ author: "Michael Sachs"
 date: "June 8, 2015"
 output: 
     ioslides_presentation:
-        widescreen: true
-        logo: US-NIH-NCI-Logo.svg
-        css: styles.css
+      css: styles.css
+      logo: US-NIH-NCI-Logo.svg
+      self_contained: no
+      widescreen: yes
 ---
 
 
@@ -16,7 +17,15 @@ library(gridSVG)
 library(grid)
 ```
 
-<script src="d3.v3.min.js"></script>
+## Steps to Interactive graphics
+
+1. Raw data
+2. Statistical transformations
+3. Rendering
+4. Modify rendered elements in browser
+
+
+<script src="d3.min.js"></script>
 
 ## Approaches to Interactive Graphs
 
@@ -25,7 +34,7 @@ library(grid)
 <text x=170 y=40 class="text1" id="first"> 
 htmlwidgets, ggvis, qtlcharts, animint, rCharts
 </text>
-<text x=350 y=40 class = "text1" id="second">
+<text x=350 y=40 class = "text1" id="second" fill = "red", font-size = "33px">
 ggplot2+gridSVG
 </text>
 <text x=375 y=40 class = "text1" id="third">
@@ -36,6 +45,26 @@ shiny
 
 <script src="slidersummary.js"></script>
 
+## ggplot2 to svg
+
+```{r ggtosvg, fig.keep='none', results = 'asis', fig.width=7.5, fig.height=4}
+ggplot(mtcars, aes(mpg, hp)) + geom_point(size = 3)
+grid::grid.force()
+pts <- grid::grid.ls(print = FALSE)$name %>%
+  grep("geom_point.points", ., value = TRUE)
+gridSVG::grid.garnish(pts, cyl = paste(mtcars$cyl), group = FALSE)
+gridSVG::grid.export(NULL)$svg
+```
+
+Not a `.png`! Generates svg code rendered by the browser
+
+
+## Manipulate the svg with `d3.js`
+
+```js
+
+
+```
 
 
 ## Proof of concept
@@ -51,44 +80,45 @@ grid.export(NULL, prefix = "cars")$svg
 ```
 
 <button id="moveme">Move the points!</button>
-
-<script>
-
-function randCol() {
-
+  
+  <script>
+  
+  function randCol() {
+    
     return "rgb(" + Math.round(Math.random()*255) + ", " + Math.round(Math.random()*255) + ", " + Math.round(Math.random()*255) + ")";
-
-} 
+    
+  } 
 
 d3.select("#moveme").on("click", function(){
-
+  
   d3.selectAll("[id^='carsgeom_point.points.2.1.']")
-    .transition().duration(500)
-    .attr("fill", randCol())
-    .attr("y", function(d){ return Number(d3.select(this).attr("y")) + 50 * (Math.random() - .5); })
-    .attr("x", function(d){ return Number(d3.select(this).attr("x")) + 25 * (Math.random() - .5); });
+  .transition().duration(500)
+  .attr("fill", randCol())
+  .attr("y", function(d){ return Number(d3.select(this).attr("y")) + 50 * (Math.random() - .5); })
+  .attr("x", function(d){ return Number(d3.select(this).attr("x")) + 25 * (Math.random() - .5); });
   
 });
 </script>
-
-
+  
+  
 ## ROC Curves
-
+  
 ```{r rocex, eval = FALSE}
 library(plotROC)
 D.ex <- rbinom(100, 1, .5)
 
 paired.data <- data.frame(M1 = rnorm(100, mean = D.ex), 
-                       M2 = rnorm(100, mean = D.ex, sd = .4), 
-                       M3 = runif(100), D = D.ex)
+                          M2 = rnorm(100, mean = D.ex, sd = .4), 
+                          M3 = runif(100), D = D.ex)
 
 roc.ci <- calculate_roc(paired.data$M1, paired.data$D, ci = TRUE, alpha = 0.05)
 ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
 
 cat(
   export_interactive_roc(ci.rocplot, 
-                         prefix = "aci")
-  )
+                         prefix = "aci", 
+                         omit.d3 = TRUE)
+)
 ```
 
 ## Result
@@ -98,16 +128,17 @@ library(plotROC)
 D.ex <- rbinom(100, 1, .5)
 
 paired.data <- data.frame(M1 = rnorm(100, mean = D.ex), 
-                       M2 = rnorm(100, mean = D.ex, sd = .4), 
-                       M3 = runif(100), D = D.ex)
+                          D = D.ex)
 
-roc.ci <- calculate_roc(paired.data$M1, paired.data$D, ci = TRUE, alpha = 0.05)
+roc.ci <- calculate_roc(paired.data$M1, paired.data$D, 
+                        ci = TRUE, alpha = 0.05)
 ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
 
 cat(
   export_interactive_roc(ci.rocplot, 
-                         prefix = "aci")
-  )
+                         prefix = "aci", 
+                         omit.d3 = TRUE)
+)
 ```
 
 
@@ -144,9 +175,9 @@ tdat2 <- NULL
 for(ttt in targ.times){
   
   tdat2 <- rbind(tdat2, tdat %>% group_by(strata) %>% do({
-  
+    
     interp(., ttt)
-  
+    
   }))
 }
 tdat <- tdat2[order(tdat2$strata, tdat2$time),]
@@ -156,7 +187,7 @@ p1 <- ggplot(gdat, aes(x = time, status = status, color = factor(sex))) + geom_k
 p1 + geom_text(data = tdat, aes(x = time, y = surv, label = n.risk, hjust = .5, vjust = -1,
                                 status = NULL, color = NULL), alpha = 0) + 
   geom_point(data = tdat, aes(x = time, y = surv,
-                                status = NULL, color = NULL), alpha = 0)
+                              status = NULL, color = NULL), alpha = 0)
 
 grid.force()
 lsg <- grep("geom_point.points.", grid.ls(print = FALSE)$name, value = TRUE)
@@ -166,43 +197,43 @@ grid.export(NULL, prefix = "km")$svg
 ```
 
 <script src="kmhover.js"></script>
-
+  
 ## Transitioning a line
-
+  
 ```{r trans, fig.keep='none', results = 'asis', echo = FALSE, fig.width=8, fig.height=6}
 sdat1 <- survfit(Surv(time, status) ~ 1, data = subset(lung, sex == 1))
 sdat2 <- survfit(Surv(time, status) ~ 1, data = subset(lung, sex == 2))
 ## create stepfunction
 dostep <- function(x,y) {
-        keep <- is.finite(x) & is.finite(y) 
-        if (!any(keep)) return()  #all points were infinite or NA
-        if (!all(keep)) {
-            # these won't plot anyway, so simplify (CI values are often NA)
-            x <- x[keep]
-            y <- y[keep]
-        }
-        n <- length(x)
-        if (n==1)       list(x=x, y=y)
-        else if (n==2)  list(x=x[c(1,2,2)], y=y[c(1,1,2)])
-        else {
-            # replace verbose horizonal sequences like
-            # (1, .2), (1.4, .2), (1.8, .2), (2.3, .2), (2.9, .2), (3, .1)
-            # with (1, .2), (.3, .2),(3, .1).  
-            #  They are slow, and can smear the looks of the line type.
-            temp <- rle(y)$lengths
-            drops <- 1 + cumsum(temp[-length(temp)])  # points where the curve drops
-
-            #create a step function
-            if (n %in% drops) {  #the last point is a drop
-                xrep <- c(x[1], rep(x[drops], each=2))
-                yrep <- rep(y[c(1,drops)], c(rep(2, length(drops)), 1))
-            }
-            else {
-                xrep <- c(x[1], rep(x[drops], each=2), x[n])
-                yrep <- c(rep(y[c(1,drops)], each=2))
-            }
-            list(x=xrep, y=yrep)
-        }
+  keep <- is.finite(x) & is.finite(y) 
+  if (!any(keep)) return()  #all points were infinite or NA
+  if (!all(keep)) {
+    # these won't plot anyway, so simplify (CI values are often NA)
+    x <- x[keep]
+    y <- y[keep]
+  }
+  n <- length(x)
+  if (n==1)       list(x=x, y=y)
+  else if (n==2)  list(x=x[c(1,2,2)], y=y[c(1,1,2)])
+  else {
+    # replace verbose horizonal sequences like
+    # (1, .2), (1.4, .2), (1.8, .2), (2.3, .2), (2.9, .2), (3, .1)
+    # with (1, .2), (.3, .2),(3, .1).  
+    #  They are slow, and can smear the looks of the line type.
+    temp <- rle(y)$lengths
+    drops <- 1 + cumsum(temp[-length(temp)])  # points where the curve drops
+    
+    #create a step function
+    if (n %in% drops) {  #the last point is a drop
+      xrep <- c(x[1], rep(x[drops], each=2))
+      yrep <- rep(y[c(1,drops)], c(rep(2, length(drops)), 1))
+    }
+    else {
+      xrep <- c(x[1], rep(x[drops], each=2), x[n])
+      yrep <- c(rep(y[c(1,drops)], each=2))
+    }
+    list(x=xrep, y=yrep)
+  }
 }
 
 step1 <- dostep(sdat1$time, sdat1$surv)
@@ -229,7 +260,27 @@ grid.export(NULL, prefix = "km2")$svg
 <input type="radio" name="sex" value="male">Male<br/>
 <input type="radio" name="sex" value="female">Female<br/>
 </form>
-
-
+  
+  
 <script src="kmtransition.js"></script>
+  
+  
+## Summary
+
+- Use rendering power of `R` -> create SVG for use in browser
+  + Visual consistency across print and web media
+- Use DOM power of `d3.js` to provide interactivity
+- Requires writing a *bit* of JS
+- Create `R` packages to accomplish specific task, e.g. `plotROC`
+- Abstract some of these ideas to make something more broadly useful 
+
+### Contact
+
+- @sachsmc ([github](http://github.com/sachsmc), [twitter](http://twitter.com/sachsmc))
+- [michael.sachs@nih.gov](mailto:michael.sachs@nih.gov)
+
+# Thank you
+
+
+
 
