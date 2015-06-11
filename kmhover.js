@@ -1,7 +1,7 @@
  // extract data from points to bind
  var pdata = [];
 
-  d3.selectAll("[id^='kmgeom_point.points.148.1.']").each(function(d, i){
+  d3.selectAll("[id^='kmgeom_point.points.232.1.']").each(function(d, i){
 
 	me = d3.select(this);
 	pdata.push({"x": me.attr("x"),
