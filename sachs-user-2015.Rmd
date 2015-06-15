@@ -282,12 +282,12 @@ grid.export(NULL, prefix = "km2")$svg
   
 ```{r rocex, eval = FALSE}
 library(plotROC)
-D.ex <- rbinom(200, 1, .5)
 
-paired.data <- data.frame(M1 = rnorm(200, mean = D.ex), 
+D.ex <- rbinom(200, 1, .5)
+ex.data <- data.frame(M1 = rnorm(200, mean = D.ex), 
                           D = D.ex)
 
-roc.ci <- calculate_roc(paired.data$M1, paired.data$D, 
+roc.ci <- calculate_roc(ex.data$M1, ex.data$D, 
                         ci = TRUE, alpha = 0.05)
 ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
 
@@ -360,7 +360,7 @@ cat(
   
 ## Summary
 
-- Use rendering power of `R` -> create SVG for use in browser
+- Use statistical and rendering power of `R` then create SVG for use in browser
     + Visual consistency across print and web media
 - Use svg modification power of `d3.js` to provide interactivity
     + Requires writing a *bit* of JS
