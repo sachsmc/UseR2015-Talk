@@ -21,6 +21,8 @@ library(dplyr)
 ```
 <script src="d3.min.js"></script>
 
+# The idea
+
 ## Steps to Interactive graphics
 
 1. Raw data
@@ -66,6 +68,8 @@ shiny
 </div>
 
 <script src="slidersummary.js"></script>
+
+# The process
 
 ## ggplot2 to svg
 
@@ -141,7 +145,7 @@ d3.select("#moveme").on("click", function(){
 });
 </script>
 
-# And now for something useful  
+# Useful applications
 
 ## Kaplan-Meier Curves {.flexbox .vcenter}
 
