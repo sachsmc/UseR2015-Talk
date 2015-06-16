@@ -46,28 +46,8 @@ gridSVG::grid.export(NULL)$svg
 
 </div>
 
-<script>
-var thispt = d3.select("[id^='geom_point.points.41.1.1']")
+<script src="intro.js"></script>
 
-var juke = 1.0;
-
-var move = setInterval(function(){
-  var curx = thispt.attr("x")
-  thispt.transition(1).attr("x", Number(curx) + juke * 200);
-}, 1);
-
-setInterval(function(){
-
-var curx = Number(thispt.attr("x"))
-if(curx > 120){
-juke = -1.0;
-} 
-if(curx < 30){
-juke = 1.0;
-}
-}, 1)
-
-</script>
 
 ## Approaches to Interactive Graphs
 
