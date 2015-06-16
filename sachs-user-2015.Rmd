@@ -111,6 +111,12 @@ points.on("click", function(){
 
 ## Manipulate the svg with `d3.js`
 
+- [`d3.js`](https://d3js.org) concepts:
+    + Select visual elements
+    + Get/modify attributes
+    + smooth transitions
+    + ... in response to events/data
+
 ```js
 var points = d3.selectAll("[id^='geom_point.points.100.1.']")
 points.on("click", function(){
@@ -283,10 +289,6 @@ grid.export(NULL, prefix = "km2")$svg
 ```{r rocex, eval = FALSE}
 library(plotROC)
 
-D.ex <- rbinom(200, 1, .5)
-ex.data <- data.frame(M1 = rnorm(200, mean = D.ex), 
-                          D = D.ex)
-
 roc.ci <- calculate_roc(ex.data$M1, ex.data$D, 
                         ci = TRUE, alpha = 0.05)
 ci.rocplot <- ggroc(roc.ci, label = "CI Example", ci = TRUE)
@@ -302,6 +304,7 @@ cat(
 
 ```{r int-nob, fig.keep='none', results = 'asis', warning = FALSE, message = FALSE, echo = FALSE, fig.width=8, fig.height=6}
 library(plotROC)
+set.seed(140)
 D.ex <- rbinom(200, 1, .5)
 
 paired.data <- data.frame(M1 = rnorm(200, mean = D.ex), 
