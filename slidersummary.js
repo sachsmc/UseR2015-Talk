@@ -1,7 +1,7 @@
 
-var margin = {top: 75, right: 50, bottom: 200, left: 50},
+var margin = {top: 75, right: 50, bottom: 75, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 350 - margin.bottom - margin.top;
+    height = 250 - margin.bottom - margin.top;
 
 var xs = d3.scale.linear()
     .domain([0, 100])
@@ -12,7 +12,7 @@ var brush = d3.svg.brush()
     .extent([0, 0])
     .on("brush", brushed);
 
-var svgs = d3.select("#approaches-to-interactive-graphs").append("svg")
+var svgs = d3.select("#slider").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -103,17 +103,17 @@ if (d3.event.sourceEvent) { // not a programmatic event
   handle.attr("cx", xs(value));
 
   if (value < 60){
-	  d3.select("#second").transition(50).attr("opacity", 0);
-	  d3.select("#third").transition(50).attr("opacity", 0);
-	  d3.select("#first").transition(150).attr("opacity", 1);
+	  d3.selectAll(".second").transition(50).attr("opacity", 0);
+	  d3.selectAll(".third").transition(50).attr("opacity", 0);
+	  d3.selectAll(".first").transition(150).attr("opacity", 1);
   } else if (value >= 60 & value < 80){
-	  d3.select("#second").transition(150).attr("opacity", 1);
-	  d3.select("#third").transition(50).attr("opacity", 0);
-	  d3.select("#first").transition(50).attr("opacity", 0);
+	  d3.selectAll(".second").transition(150).attr("opacity", 1);
+	  d3.selectAll(".third").transition(50).attr("opacity", 0);
+	  d3.selectAll(".first").transition(50).attr("opacity", 0);
   } else if (value >= 80) {
-	  d3.select("#second").transition(50).attr("opacity", 0);
-	  d3.select("#third").transition(150).attr("opacity", 1);
-	  d3.select("#first").transition(50).attr("opacity", 0);
+	  d3.selectAll(".second").transition(50).attr("opacity", 0);
+	  d3.selectAll(".third").transition(150).attr("opacity", 1);
+	  d3.selectAll(".first").transition(50).attr("opacity", 0);
   }
 
 }
