@@ -22,7 +22,7 @@ library(dplyr)
 <script src="d3.min.js"></script>
 
 
-# The punchline
+# The Result
 ## ROC Curves - Briefly
 
 <iframe src="https://sachsmc.shinyapps.io/illustrateROC"></iframe>
@@ -120,7 +120,7 @@ gridSVG::grid.export(NULL)$svg
 
 <script src="intro.js"></script>
 
-## ggplot2 to svg
+## ggplot2 to svg {.flexbox .vcenter}
 
 ```{r ggtosvg, fig.keep='none', results = 'asis', fig.width=7.5, fig.height=3.5}
 ggplot(mtcars, aes(mpg, hp)) + geom_point(size = 5)
@@ -128,14 +128,14 @@ grid::grid.force()
 pts <- grid::grid.ls(print = FALSE)$name %>%
   grep("geom_point.points", ., value = TRUE)
 gridSVG::grid.garnish(pts, cyl = paste(mtcars$cyl), group = FALSE)
-gridSVG::grid.export(NULL)$svg
+gridSVG::grid.export(NULL, prefix = "mt1")$svg
 ```
 
-Not a `.png`! Generates svg code rendered by the browser
+Not a `.png`! Generates svg code interpreted by the browser
 
 
 <script>
-var points = d3.selectAll("[id^='geom_point.points.279.1.']")
+var points = d3.selectAll("[id^='mt1geom_point.points.279.1.']")
 points.on("click", function(){
   // do something 
   alert("cyl: " + d3.select(this).attr("cyl"));
@@ -151,7 +151,7 @@ points.on("click", function(){
     + ... in response to events/data
 
 ```js
-var points = d3.selectAll("[id^='geom_point.points.100.1.']")
+var points = d3.selectAll("[id^='mt1geom_point.points.279.1.']")
 points.on("click", function(){
   // do something 
   alert("cyl: " + d3.select(this).attr("cyl"));
@@ -407,9 +407,10 @@ Needs shiny server
     + Visual consistency across print and web media
 - Use svg modification power of `d3.js` to provide interactivity
     + Requires writing a *bit* of JS
+    + Good way to learn d3
     
 ### Path forward
-- Create `R` packages to accomplish specific task, e.g. `plotROC`
+- Create `R` packages to accomplish specific task, e.g. `plotROC`, `plotKM`?
 - Abstract some of these ideas to make something more broadly useful 
 
 
