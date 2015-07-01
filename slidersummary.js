@@ -1,6 +1,6 @@
 
 var margin = {top: 75, right: 50, bottom: 75, left: 50},
-    width = 960 - margin.left - margin.right,
+    width = 820 - margin.left - margin.right,
     height = 250 - margin.bottom - margin.top;
 
 var xs = d3.scale.linear()
