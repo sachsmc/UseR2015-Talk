@@ -1,9 +1,9 @@
-var pline = d3.select("[id='km2GRID.polyline.465.1.1']");
-var panel = d3.select("[id='km2panel.background.rect.471.1.1']");
-var newy1 = d3.select("[id='km2GRID.polyline.465.1']").attr("tipy1").split(",");
-var newx1 = d3.select("[id='km2GRID.polyline.465.1']").attr("tipx1").split(",");
-var newy2 = d3.select("[id='km2GRID.polyline.465.1']").attr("tipy2").split(",");
-var newx2 = d3.select("[id='km2GRID.polyline.465.1']").attr("tipx2").split(",");
+var pline = d3.select("[id='km2GRID.polyline.644.1.1']");
+var panel = d3.select("[id='km2panel.background.rect.650.1.1']");
+var newy1 = d3.select("[id='km2GRID.polyline.644.1']").attr("tipy1").split(",");
+var newx1 = d3.select("[id='km2GRID.polyline.644.1']").attr("tipx1").split(",");
+var newy2 = d3.select("[id='km2GRID.polyline.644.1']").attr("tipy2").split(",");
+var newx2 = d3.select("[id='km2GRID.polyline.644.1']").attr("tipx2").split(",");
 
 var y = d3.scale.linear()
 		.domain([-.05, 1.05])
