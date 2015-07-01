@@ -21,14 +21,17 @@ library(dplyr)
 ```
 <script src="d3.min.js"></script>
 
+# The Problem
 
-# The Result
+## ROC Curves in Medicine
+![onepoint](onepoint.png)
+
 ## ROC Curves - Briefly
 
 <iframe src="https://sachsmc.shinyapps.io/illustrateROC"></iframe>
 
 
-## Click anywhere {.flexbox .vcenter}
+## A Solution {.flexbox .vcenter}
 
 ```{r int-nob, fig.keep='none', results = 'asis', warning = FALSE, message = FALSE, echo = FALSE, fig.width=8, fig.height=6}
 library(plotROC)
@@ -50,7 +53,7 @@ cat(
 ```
 
 
-## The code
+## The Code
   
 ```{r rocex, eval = FALSE}
 library(plotROC)
@@ -64,9 +67,11 @@ cat(
                          prefix = "aci", 
                          omit.d3 = TRUE)
 )
+
+plot_journal_roc(ci.rocplot)
 ```
 
-## Multiple ROC curves {.flexbox .vcenter}
+## Multiple ROC Curves {.flexbox .vcenter}
 
 ```{r multistart, include = FALSE}
 D.ex <- rbinom(100, 1, .5)
@@ -91,9 +96,9 @@ cat(
 
 
 
-# The process
+# The Process
 
-## Steps to Interactive graphics
+## Steps to Interactive Graphics
 
 1. Raw data
     ```{r, echo = FALSE}
@@ -194,7 +199,7 @@ d3.select("#moveme").on("click", function(){
 });
 </script>
 
-# Useful applications
+# Other Useful Applications
 
 ## Kaplan-Meier Curves {.flexbox .vcenter}
 
@@ -249,7 +254,7 @@ grid.export(NULL, prefix = "km")$svg
 
 <script src="kmhover.js"></script>
   
-## Transitioning a line {.flexbox .vcenter}
+## Transitioning a Line {.flexbox .vcenter}
   
 ```{r trans, fig.keep='none', results = 'asis', echo = FALSE, fig.width=8, fig.height=6}
 sdat1 <- survfit(Surv(time, status) ~ 1, data = subset(lung, sex == 1))
@@ -315,7 +320,7 @@ grid.export(NULL, prefix = "km2")$svg
   
 <script src="kmtransition.js"></script>
   
-
+# Lessons Learned
 ## Tips
 
 - Bind data to svg elements with `grid.garnish(key = value)`
@@ -393,6 +398,9 @@ Can do R computations
 <text x=400 y=100>
 Needs shiny server
 </text>
+<text x=400 y=140>
+transitions?
+</text>
 </g>
 </svg>
 </div>
@@ -410,7 +418,7 @@ Needs shiny server
     + Good way to learn d3
     
 ### Path forward
-- Create `R` packages to accomplish specific task, e.g. `plotROC`, `plotKM`?
+- Create `R` packages to accomplish specific task, e.g. `plotROC`, (`plotKM`?)
 - Abstract some of these ideas to make something more broadly useful 
 
 
